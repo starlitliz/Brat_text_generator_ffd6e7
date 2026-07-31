@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>brat font generator 🩷</title>
+    <style>
+        :root {
+            --cherry-blossom-pink: #ffd6e7; 
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #121212;
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            margin: 0;
+        }
+        h1 {
+            margin-bottom: 5px;
+        }
+                p {
+            color: #aaa;
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            max-width: 500px;
+            width: 100%;
+        }
+        .brat-preview-box {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            background-color: var(--cherry-blossom-pink);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .brat-text {
+            color: #000;
+            font-family: "Arial Narrow", Arial, sans-serif;
+            font-weight: bold;
+            font-size: 48px;
+            text-align: justify;
+            text-justify: inter-word;
+            line-height: 0.9;
+            letter-spacing: -0.04em;
+            text-transform: lowercase;
+            white-space: pre-wrap;
+            padding: 20px;
+            transition: filter 0.1s ease, transform 0.1s ease;
+            transform: scaleX(1.4);
+            transform-origin: center center;
+        }
+        @media (min-width: 500px) {
+            .brat-text {
+                font-size: 48px;
+            }
+        }
+        .controls {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            background: #1e1e1e;
+            padding: 20px;
+            border-radius: 8px;
+            box-sizing: border-box;
+        }
+        label {
+            font-size: 14px;
+            font-weight: bold;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        textarea, input[type="range"] {
+            width: 100%;
+            background: #2d2d2d;
+            border: 1px solid #444;
+            color: white;
+            padding: 10px;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+        textarea {
+            resize: vertical;
+            height: 80px;
+        }
+        .btn-download {
+            background-color: var(--cherry-blossom-pink);
+            color: #000;
+            border: none;
+            padding: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: opacity 0.2s;
+        }
+        .btn-download:hover {
+            opacity: 0.9;
+        }
+        input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 8px;
+    background: #444; /* Track color */
+    border-radius: 5px;
+    outline: none;
+}
+
+/* chrome, edge, safari */
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    background: #f6c2d9; /* Thumb color */
+    border-radius: 100%;
+    cursor: pointer;
+}
+
+/*firefox */
+input[type="range"]::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    background: #f6c2d9;
+    border-radius: 100%;
+    border: none;
+    cursor: pointer;
+}
+    </style>
+    </head>
+
+    <body>
+        <h1>brat font generator </h1>
+        <p> recreate  the album's typography in cherry blossom pink 🌸</p>
+        <div class="container">
+            
+            <div class="brat-preview-box" id="previewBox">
+                <div class="brat-text" id="bratDisplay">brat</div>
+            </div>
+
+            <div class="controls"> 
+
+                <label>
+                text content:
+                <textarea id="textInput" placeholder="type your text here...">brat</textarea>
+                </label>
+
+                <label>
+                text size:
+                <input type="range" id="sizeInput" min="20" max="120" step="1" value="48">
+                </label>
+                
+                <label>
+                text stretch:
+                <input type="range" id="stretchInput" min="1" max="2" step="0.05" value="1.4">
+                </label>
+
+                <label>
+                lo-fi blur intensity:
+                <input type="range" id="blurInput" min="0" max="4" step="0.5" value="0.5">
+                </label>
+
+                <button class="btn-download" id="downloadBtn">download png</button>
+            </div>
+        </div>
+
+        <script>
+        const textInput = document.getElementById('textInput');
+        const sizeInput = document.getElementById('sizeInput');
+        const blurInput = document.getElementById('blurInput');
+        const stretchInput = document.getElementById('stretchInput');
+        const bratDisplay = document.getElementById('bratDisplay');
+        const downloadBtn = document.getElementById('downloadBtn');
+
+        function updatePreview() {
+            bratDisplay.textContent = textInput.value.toLowerCase();
+            bratDisplay.style.fontSize = `${sizeInput.value}px`;
+            
+            const blurValue = blurInput.value;
+            bratDisplay.style.filter = blurValue > 0 ? `blur(${blurValue}px)` : 'none';
+            
+            // dynamic CSS transformation hook
+            bratDisplay.style.transform = `scaleX(${stretchInput.value})`;
+        }
+
+        function downloadBratImage() {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+
+            const SIZE = 1080;
+            canvas.width = SIZE;
+            canvas.height = SIZE;
+
+            // the preview box renders at up to 500px wide; scale everything up so
+            // the exported image matches what's shown on screen 1:1
+            const scale = SIZE / 500; // 2.16
+
+            ctx.fillStyle = "#ffd6e7";
+            ctx.fillRect(0, 0, SIZE, SIZE);
+
+            const blurVal = parseFloat(blurInput.value) * scale;
+            if (blurVal > 0) {
+                ctx.filter = `blur(${blurVal}px)`;
+            }
+
+            ctx.fillStyle = "#000000";
+
+            // mirror the preview's .brat-text styles
+            const fontSize = parseFloat(sizeInput.value) * scale;
+            ctx.font = `bold ${fontSize}px "Arial Narrow", Arial, sans-serif`;
+            ctx.textBaseline = "middle";
+            if ('letterSpacing' in ctx) {
+                ctx.letterSpacing = `${-0.04 * fontSize}px`; // matches letter-spacing: -0.04em
+            }
+
+            const stretchVal = parseFloat(stretchInput.value); // scaleX
+            const padding = 20 * scale;
+            const lineHeight = fontSize * 0.9; // matches line-height: 0.9
+
+            // horizontal space available in the UN-stretched coordinate space
+            // (we scale the context by stretchVal, so measurements happen pre-stretch)
+            const maxWidth = (SIZE - padding * 2) / stretchVal;
+
+            // word-wrap each paragraph the same way the preview box wraps text
+            const rawLines = textInput.value.toLowerCase().split('\n');
+            const lines = [];
+            rawLines.forEach(raw => {
+                const words = raw.split(/\s+/).filter(w => w.length);
+                if (!words.length) {
+                    lines.push({ words: [], last: true });
+                    return;
+                }
+                let current = [];
+                words.forEach(word => {
+                    const test = current.concat(word);
+                    if (ctx.measureText(test.join(' ')).width > maxWidth && current.length) {
+                        lines.push({ words: current, last: false });
+                        current = [word];
+                    } else {
+                        current = test;
+                    }
+                });
+                lines.push({ words: current, last: true });
+            });
+
+            const wrapped = lines.length > 1;
+            const totalHeight = lines.length * lineHeight;
+            let y = (SIZE - totalHeight) / 2 + lineHeight / 2;
+
+            ctx.save();
+            ctx.scale(stretchVal, 1.0);
+
+            const originX = padding / stretchVal;          // left content edge (scaled space)
+            const centerX = SIZE / stretchVal / 2;         // canvas center (scaled space)
+
+            lines.forEach(lineObj => {
+                const words = lineObj.words;
+                if (words.length === 0) { y += lineHeight; return; }
+
+                // CSS text-align: justify stretches every line except the last of a
+                // paragraph; a single unwrapped line stays centered (flex-centered block)
+                if (words.length > 1 && wrapped && !lineObj.last) {
+                    let wordsWidth = 0;
+                    words.forEach(w => wordsWidth += ctx.measureText(w).width);
+                    const gap = (maxWidth - wordsWidth) / (words.length - 1);
+                    let x = originX;
+                    ctx.textAlign = "left";
+                    words.forEach(word => {
+                        ctx.fillText(word, x, y);
+                        x += ctx.measureText(word).width + gap;
+                    });
+                } else if (wrapped) {
+                    // last line of a wrapped paragraph: left-aligned like CSS justify
+                    ctx.textAlign = "left";
+                    ctx.fillText(words.join(' '), originX, y);
+                } else {
+                    // single line: centered, matching the preview
+                    ctx.textAlign = "center";
+                    ctx.fillText(words.join(' '), centerX, y);
+                }
+                y += lineHeight;
+            });
+            ctx.restore();
+
+            const link = document.createElement('a');
+            link.download = 'brat_style_cover.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+
+        textInput.addEventListener('input', updatePreview);
+        sizeInput.addEventListener('input', updatePreview);
+        blurInput.addEventListener('input', updatePreview);
+        stretchInput.addEventListener('input', updatePreview);
+        downloadBtn.addEventListener('click', downloadBratImage);
+
+        
+        updatePreview();
+    </script>
+
+    </body>
+</html>
